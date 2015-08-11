@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
 import numpy as np
 
 class ChemSankey(object):
@@ -9,7 +10,8 @@ class ChemSankey(object):
                                        )
 
     def _add_node(self,loc,**kwargs):
-        
+        ell = Ellipse(loc, 0.1, 0.075)
+        self.ax.add_artist(ell)
 
     def _make_connection(self,A,B,width=0.01,**kwargs):
         a1, a2 = A[0],A[1]
@@ -28,6 +30,9 @@ locs = {'A':np.array([0.,.7]),
         }
 
 CS = ChemSankey()
+CS._add_node(locs['A'])
+CS._add_node(locs['B'])
+CS._add_node(locs['C'])
 CS._make_connection(locs['A'],locs['B'])
 CS._make_connection(locs['A'],locs['C'],width=0.04)
 #fig = plt.figure()
