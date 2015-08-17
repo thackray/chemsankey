@@ -25,11 +25,28 @@ class ChemSankey(object):
                          **kwargs):
         a1, a2 = A[0],A[1]
         b1, b2 = B[0],B[1]
+        d1 = b1-a1
+        d2 = b2-a2
+        b = abs(bend)
         path_codes = [Path.MOVETO,
                       Path.CURVE3,
                       Path.CURVE3,
                       ]
-        Cont = [a1/abs(bend) + b1/bend, a2/abs(bend) + b2/bend]
+        if bend < -0.1:
+            Cont = [b1, a2]
+        elif bend > 0.1:
+            Cont = [a1, b2]
+        else:
+            Cont = [a1/2. + b1/2., a2/2. + b2/2.]
+        if (abs(d1) < 0.01) and (bend > 0.1):
+            Cont = [a1 + d2/2*b , a2 + d2/2*b]
+        elif (abs(d1) < 0.01) and (bend < -0.1):
+            Cont = [a1 - d2/2*b , a2 + d2/2*b]
+        elif (abs(d2) < 0.01) and (bend > 0.1):
+            Cont = [a1 + d1/2*b , a2 + d1/2*b]
+        elif (abs(d2) < 0.01) and (bend < -0.1):
+            Cont = [a1 + d1/2*b , a2 - d1/2*b]
+        #    Cont = [a1/abs(bend) + b1/bend, a2/abs(bend) + b2/bend]
         P = Path([A,Cont,B],path_codes)
         PP = PathPatch(P, 
                        fill=False,
@@ -54,7 +71,7 @@ class ChemSankey(object):
         return
 
     def _make_connections(self, ):
-        bends = [2., 1.5, 0.5]
+        bends = [-.25, .25]
         conn_counter = {}
         for i,conn in enumerate(self.connections):
             FROM = self.connections[conn]['from']
@@ -73,7 +90,9 @@ class ChemSankey(object):
             conn_counter[conn_name] += 1
 
     def _draw_node_label(self, loc, label):
-        self.ax.text(loc[0],loc[1],label)
+        self.ax.text(loc[0],loc[1],label,
+                     verticalalignment='center',
+                     horizontalalignment='center')
         return
 
     def _draw_nodes(self, ):
